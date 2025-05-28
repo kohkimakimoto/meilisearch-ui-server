@@ -7,7 +7,7 @@ PATH := $(CURDIR)/.dev/go-tools/bin:$(PATH)
 # The first part of the version is the version of the meilisearch-ui, the second part is the patch version of meilisearch-ui-server itself.
 # For example, 0.12.2-0 means that the meilisearch-ui version is 0.12.2 and the patch version of meilisearch-ui-server is 0.
 # You MUST update MEILISEARCH_UI_VERSION and VERSION in the above rule.
-VERSION := "0.12.2-0"
+VERSION := "0.12.2-1"
 # Meilisearch UI version: This is the version of the meilisearch-ui that will be built.
 MEILISEARCH_UI_VERSION := "v0.12.2"
 BUILD_LDFLAGS = "-s -w -X main.Version=$(VERSION)"

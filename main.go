@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -59,6 +60,31 @@ Version: ` + Version + `
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	// handle 404 response.
+	// We need to handle 404 errors to serve index.html for SPA client-side routing.
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			err := next(c)
+
+			// If the file is not found, serve index.html for SPA client-side routing
+			if err != nil && errors.Is(err, echo.ErrNotFound) {
+				// read index.html for serving the SPA client-side routing.
+				indexFile, err := distFS.Open("index.html")
+				if err != nil {
+					return fmt.Errorf("failed to open index.html: %w", err)
+				}
+				defer indexFile.Close()
+				indexContent, err := io.ReadAll(indexFile)
+				if err != nil {
+					return fmt.Errorf("failed to read index.html: %w", err)
+				}
+				return c.HTMLBlob(http.StatusOK, indexContent)
+			}
+
+			return err
+		}
+	})
 
 	// Static files
 	e.StaticFS("/", distFS)
